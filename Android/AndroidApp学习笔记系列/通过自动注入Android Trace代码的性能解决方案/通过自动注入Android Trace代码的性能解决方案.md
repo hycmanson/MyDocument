@@ -10,7 +10,7 @@ TraceView会Trace VM的所有Jave Method，也就是说，Framework的类也会�
 
 Systrace只对系统模块的Key Point进行跟踪，比如ViewRootImpl：
 
-```java
+``` java?linenums
     private void performMeasure(int childWidthMeasureSpec, int childHeightMeasureSpec) {
         Trace.traceBegin(Trace.TRACE_TAG_VIEW, "measure");
         try {
@@ -26,10 +26,14 @@ Systrace只对系统模块的Key Point进行跟踪，比如ViewRootImpl：
 我们都知道Android运行的是dex文件是由class文件转换而来，可在class转换成dex的时候，用ASM进行AOP，在Method的 出入口注入Trace.beginSection及Trace.endSection代码，可完成对APP所有的代码进行Trace的工作。
 
 整个过程的操作如下：
-1. find ~/.m2/repository/ -name *.dex | xargs rm –rf（删除本地maven的dex缓存）。
-2. 打开main_build的pom的agent-maven-plugin并修改版本为1.0.1.3-SNAPSHOT：
+1. 
+``` bash?linenums
+find ~/.m2/repository/ -name *.dex | xargs rm –rf
+```
+（删除本地maven的dex缓存）。
 
-```xml
+2. 打开main_build的pom的agent-maven-plugin并修改版本为1.0.1.3-SNAPSHOT：
+``` xml?linenums
 <plugin>
     <groupId>com.taobao.android</groupId>
     <artifactId>agent-maven-plugin</artifactId>
@@ -45,8 +49,19 @@ Systrace只对系统模块的Key Point进行跟踪，比如ViewRootImpl：
 ```
 
 并打包，安装APK。
-3. python systrace.py --app=com.taobao.taobao -b 40960（指定app的名字，设置Ftrace的BufferQueue的大小，可以添加其他Systrace选项）, 也可以在Eclipse或者Android Studio里面完成。
-4. sed -ig 's/name in parentNames/true/g' trace.html(Trace不做begin跟end的检测)。
+
+3. 
+``` bash?linenums
+python systrace.py --app=com.taobao.taobao -b 40960
+```
+（指定app的名字，设置Ftrace的BufferQueue的大小，可以添加其他Systrace选项）, 也可以在Eclipse或者Android Studio里面完成。
+
+4.
+``` bash?linenums
+sed -ig 's/name in parentNames/true/g' trace.html
+```
+(Trace不做begin跟end的检测)。
+
 5. 分析trace.html文件。
 
 可得到如下效果的Trace文件：
@@ -74,7 +89,11 @@ CoordTask #1与UI Thread在进行inflate，inflate是有同步锁的，此时可
 2. 在Trace APP代码的同时，可充分利用Systrace System功能分析APP的性能。比如多Lock Content、Jank等复杂问题，依旧清晰可见，一目了然。
 
 参考文献：
+
 http://developer.android.com/intl/zh-cn/tools/help/systrace.html
+
 http://developer.android.com/intl/zh-cn/tools/debugging/systrace.html
+
 http://developer.android.com/intl/zh-cn/tools/debugging/debugging-tracing.html
+
 http://blog.csdn.net/innost/article/details/9008691
