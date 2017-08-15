@@ -1,4 +1,4 @@
-Android有着许多可视化性能工具：TraceView、Systrace、HierarchyViewer等等，各自的优缺点在[通过自动注入Android Trace代码的性能解决方案](https://github.com/hycmanson/AndroidLearning/blob/master/AndroidApp%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E7%B3%BB%E5%88%97/%E9%80%9A%E8%BF%87%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5Android%20Trace%E4%BB%A3%E7%A0%81%E7%9A%84%E6%80%A7%E8%83%BD%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.md)有介绍。通过自动注入Android Trace代码的方式，来分析启动的性能。
+Android有着许多可视化性能工具：TraceView、Systrace、HierarchyViewer等等，各自的优缺点在[通过自动注入Android Trace代码的性能解决方案](https://github.com/hycmanson/MyDocument/blob/master/Android/AndroidApp%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E7%B3%BB%E5%88%97/%E9%80%9A%E8%BF%87%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5Android%20Trace%E4%BB%A3%E7%A0%81%E7%9A%84%E6%80%A7%E8%83%BD%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E9%80%9A%E8%BF%87%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5Android%20Trace%E4%BB%A3%E7%A0%81%E7%9A%84%E6%80%A7%E8%83%BD%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.md)有介绍。通过自动注入Android Trace代码的方式，来分析启动的性能。
 
 #1.SvipLifeCycleObserver.onActivityResumed的Mtop请求:
 
