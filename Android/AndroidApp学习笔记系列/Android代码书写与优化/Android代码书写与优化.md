@@ -3,7 +3,7 @@
 ### 什么是语句块
 有着相同的变量作用域的相关一组语句的集合，看起来就是应该用{}括起来的，比如控制结构中的逻辑。我认为最关键的一点就是变量作用域，也就是说，如果能用同一个局部变量，那么就是程序意义上的语句块。来看个例子：
 
-``` java
+``` java?linenums
 public void onClick(View v) {
     int id = v.getId();
     switch (id) {
@@ -25,7 +25,7 @@ public void onClick(View v) {
 
 语句块的应用
 
-``` java
+``` java?linenums
 public void onClick(View v) {
     int id = v.getId();
     switch (id) {
@@ -51,7 +51,7 @@ public void onClick(View v) {
 
 ![4Example](https://raw.githubusercontent.com/hycmanson/MyDocument/master/CommonImages/4example.png)
 
-``` java
+``` java?linenums
 class DBHelper extends SQLiteOpenHelper {
     private static DBHelper mDbHelper;
 
@@ -80,7 +80,7 @@ class DBHelper extends SQLiteOpenHelper {
 
 少了同步锁多线程就有了不同步的隐患，想办法改进一下。
 
-``` java
+``` java?linenums
 class DBHelper extends SQLiteOpenHelper {
     private static DBHelper mDbHelper;
 
@@ -109,7 +109,7 @@ class DBHelper extends SQLiteOpenHelper {
 
 ### 1、饿汉模式创建单例
 
-``` java
+``` java?linenums
 class HungrySingleton {
     private static HungrySingleton instance = new HungrySingleton();
 
@@ -123,7 +123,7 @@ class HungrySingleton {
 
 ### 2、懒汉模式
 
-``` java
+``` java?linenums
 class LazySingleton {
     private static LazySingleton instance;
 
@@ -140,7 +140,7 @@ class LazySingleton {
 
 ### 3、使用双重检查锁的懒汉模式
 
-``` java
+``` java?linenums
 class DoubleCheckSingleton {
     private volatile static DoubleCheckSingleton instance;
 
@@ -161,7 +161,7 @@ class DoubleCheckSingleton {
 
 ### 4、静态内部类
 
-``` java
+``` java?linenums
 class StaticInnerClassSingleton {
     private StaticInnerClassSingleton() {}
 
@@ -204,7 +204,7 @@ volatile标记的变量不会被编译器优化,而synchronized标记的变量�
 
 ## 多用用obtain()方法
 
-```java
+```java?linenums
     /**
      * Return a new Message instance from the global pool. Allows us to
      * avoid allocating new objects in many cases.
@@ -226,7 +226,7 @@ volatile标记的变量不会被编译器优化,而synchronized标记的变量�
 
 grep了一下frameworks的代码，列出以下几个比较常见的类。
 
-``` bash
+``` bash?linenums
 ./android/view/MotionEvent.java:1387:    static private MotionEvent obtain() {}
 ./android/view/KeyEvent.java:1858:    private static KeyEvent obtain() {}
 ./android/os/Message.java:106:    public static Message obtain() {}
