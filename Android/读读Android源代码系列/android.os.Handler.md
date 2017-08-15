@@ -1,6 +1,6 @@
-#读读Android源代码 android.os.Handler
+# 读读Android源代码 android.os.Handler
 
-#接收指令（Message）才会干活的Handler机器人
+## 接收指令（Message）才会干活的Handler机器人
 
 [Reference 4 Handler](https://developer.android.com/reference/android/os/Handler.html)
 
@@ -16,9 +16,9 @@ Handler的一般使用方式：
 2.在其他线程调用这个Handler对象的post、sendMessage方法
 3.Handler的handleMessage收到Message处理。
 
-#Handler()
+## Handler()
 我们先来看看构造器。
-``` java
+``` java?linenums
 public class Handler {
     ...
     /**
@@ -68,17 +68,17 @@ public class Handler {
     ...
 }
 ```
-##可以看出对外公开的接口有这四个：
+### 可以看出对外公开的接口有这四个：
 + Handler()
 + Handler(Handler.Callback callback)
 + Handler(Looper looper)
 + Handler(Looper looper, Handler.Callback callback)
 
-###Handler()
+#### Handler()
 这个方法会自动获取当前线程的Looper，如果没有Looper则会丢出异常。（如果在主线程初始化，主线程在初始化时会创建一个Looper。如果在其他线程就需要先初始化一个Looper再创建Handler对象。）
 
-![4Example](https://raw.githubusercontent.com/hycmanson/AndroidLearning/master/MarkDownImages/4example.png)
-``` java
+![4Example](https://raw.githubusercontent.com/hycmanson/MyDocument/master/MarkDownImages/4example.png)
+``` java?linenums
 public class LooperThread extends Thread {
     @Override
     public void run() {
@@ -92,21 +92,21 @@ public class LooperThread extends Thread {
 }
 ```
 
-###Handler(Handler.Callback callback)
+#### Handler(Handler.Callback callback)
 使用传入的Callback函数。
 
-###Handler(Looper looper)
+#### Handler(Looper looper)
 使用传入的Looper。
 
-###Handler(Looper looper, Handler.Callback callback)
+#### Handler(Looper looper, Handler.Callback callback)
 使用传入的Looper与Callback函数。
 
-##还有三个@hide的方法
+### 还有三个@hide的方法
 + Handler(boolean async)
 + Handler(Callback callback, boolean async)
 + Handler(Looper looper, Callback callback, boolean async)
 
-``` java
+``` java?linenums
 public class Handler {
     /*
      * Set this flag to true to detect anonymous, local or member classes
@@ -206,7 +206,7 @@ public class Handler {
     ...
 }
 ```
-###Handler(Callback callback, boolean async)
+#### Handler(Callback callback, boolean async)
 我们关注一下这个构造器的代码，看看它都做了什么。
 1.if语句判断是否打开检测Handler可疑内存泄漏的检测开关。
 2.判断这个Handler是否是匿名类或内部类或是本地定义的类，并且是否是static的。如果不是打印警告信息。
@@ -215,9 +215,9 @@ public class Handler {
 5.获取到Looper的MessageQueue。
 6.设置Callback和是否同步。
 
-#sendMessage()
+## sendMessage()
 先从sendMessage()开始看起，这是我们使用Handler中最多的方法。
-``` java
+``` java?linenums
 public class Handler {
     ...
     /**
@@ -359,10 +359,10 @@ public class Handler {
 + public boolean sendMessageAtTime(Message msg, long uptimeMillis)
 + public final boolean sendMessageAtFrontOfQueue(Message msg)
 
-##sendEmptyMessageDelayed()
+### sendEmptyMessageDelayed()
 1.通过Message.obtain()方法从Message pool获取到一个Message。
 2.赋值what，调用sendMessageDelayed方法。
-``` java
+``` java?linenums
 public final class Message implements Parcelable {
     ...
     private static final Object sPoolSync = new Object();
@@ -392,16 +392,16 @@ public final class Message implements Parcelable {
 
 这里值得一提的是，Message我们可以不使用new来创建对象。使用Message.obtain()方法Message提供一种回收机制，结束使命的Message会回到Message pool里面等待下次使用，如果Message pool为空会返回一个new Message对象。这样就会减少new和回收时的资源消耗。
 
-##sendEmptyMessageAtTime()
+### sendEmptyMessageAtTime()
 同sendEmptyMessageDelayed()方法，调用sendMessageAtTime();
 
-##sendMessageDelayed()
+### sendMessageDelayed()
 实际也是调用sendMessageAtTime()，只是把时间包装了一下，使得使用方便。
 
-##sendMessageAtTime()与sendMessageAtFrontOfQueue()
+### sendMessageAtTime()与sendMessageAtFrontOfQueue()
 这两个方法基本一致，通过方法名字也可以分别出来其中的作用。
 判断一下mQueue这个成员是否为空。跟踪一下这个成员是在Looper的构造器里初始化的。
-``` java
+``` java?linenums
 public class Looper {
     ...
     final MessageQueue mQueue;
@@ -421,9 +421,9 @@ public class Looper {
 MessageQueue为空就丢异常出来了。
 后面继续执行enqueueMessage()方法。
 
-##enqueueMessage()
+### enqueueMessage()
 
-``` java
+``` java?linenums
 public class Handler {
     ...
     final boolean mAsynchronous;
@@ -439,7 +439,7 @@ public class Handler {
 ```
 1.给Message赋值当前的Handler对象到Message的target成员。
 2.判断是否需要设置Message同步。
-``` java
+``` java?linenums
 public class Message {
     ...
     /** If set message is asynchronous */
@@ -474,7 +474,7 @@ public class Message {
 [See Message Source](http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/4.2.2_r1/android/os/Message.java#Message.setAsynchronous%28boolean%29)
 
 3.执行MessageQueue.enqueueMessage()方法。
-``` java
+``` java?linenums
 public class MessageQueue {
     ...
     @SuppressWarnings("unused")
@@ -543,8 +543,8 @@ public class MessageQueue {
 3.将Message加入队列，如果没有队列则创建。
 4.唤醒nativePollOnce的等待。
 
-#dispatchMessage()
-``` java
+## dispatchMessage()
+``` java?linenums
 public class Handler {
     ...
     /**
@@ -577,8 +577,8 @@ public class Handler {
 这里可以看到，sendMessage()方法加入到MessageQueue中的消息，在Looper的loop方法中得到了处理，而且系统默认把handleMessage()方法留空就是为了给开发者重写来处理异步的事件。
 
 
-#post()
-``` java
+## post()
+``` java?linenums
 public class Handler {
     ...
     /**
@@ -702,8 +702,8 @@ public class Handler {
 ```
 其实可以看出来就是把Runable对象包装成Message的Callback成员，成为Message继续调用sendMessage方法。
 
-#obtainMessage()
-``` java
+## obtainMessage()
+``` java?linenums
 public class Handler {
     ...
         /**
@@ -773,8 +773,8 @@ public class Handler {
 }
 ```
 实际上是调用Message.obtain()方法。
-#hasxxx()与removexxx()
-``` java
+## hasxxx()与removexxx()
+``` java?linenums
 public class Handler {
     ...
     /**
@@ -844,8 +844,8 @@ public class Handler {
 ```
 除了hasCallbacks(Runnable r)方法以外，其他都是公开接口。通过方法名字也能看出其中的作用，这里就不再阐述。
 
-#dump()
-``` java
+## dump()
+``` java?linenums
 public class Handler {
     ...
     public final void dump(Printer pw, String prefix) {
@@ -860,7 +860,7 @@ public class Handler {
 }
 ```
 dump()方法实际上调用了Looper.dump()方法。
-``` java
+``` java?linenums
 public class Looper {
     ...
     final MessageQueue mQueue;
@@ -892,8 +892,8 @@ public class Looper {
 
 [See Looper Source](http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/4.2.2_r1/android/os/Looper.java#257)。
 
-#BlockingRunnable.class与runWithScissors()
-``` java
+## BlockingRunnable.class与runWithScissors()
+``` java?linenums
 public class Handler {
     ...
     final Looper mLooper;
@@ -1006,8 +1006,8 @@ public class Handler {
 1.这个方法先判断当前的线程是否为Handler线程，是否含有Looper，如果有则执行Callback返回。
 2.如果不是则创建一个BlockingRunnable对象，调用postAndWait将这个Message加入到MessageQueue里，等待上面的run方法被调用以后，唤醒这个wait。
 
-#getIMessenger()
-``` java
+## getIMessenger()
+``` java?linenums
 public class Handler {
     ...
     final IMessenger getIMessenger() {
