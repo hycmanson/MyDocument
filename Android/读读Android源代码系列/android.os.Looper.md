@@ -1,15 +1,15 @@
-#读读Android源代码 android.os.Looper
+# 读读Android源代码 android.os.Looper
 
-#Looper不会停止的消息处理机
+## Looper不会停止的消息处理机
 [Reference 4 Looper](https://developer.android.com/reference/android/os/Looper.html)
 [Source 4 Looper](http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/4.2.2_r1/android/os/Looper.java)
 
 从字面上了解是“循环者”，也就是在不停的循环状态。所谓Looper线程就是循环工作的线程。在程序开发中我们经常会需要一个线程不断循环，一旦有新任务则执行，执行完继续等待下一个任务，这就是Looper。
 这里请不要把Looper与线程之间的概念相混淆，Looper其实可以看作线程的一个功能。一个普通的线程是没有Looper的功能的。通过在当前线程执行Looper.prepare()之后，当前线程就有了Looper的功能。使当前线程成为一个Looper线程。
 
-#prepare()
+## prepare()
 在一个普通线程会调用prepare()方法
-``` java
+``` java?linenums
 public class Looper {
     ...
     // sThreadLocal.get() will return null unless you've called prepare().
@@ -49,7 +49,7 @@ public class Looper {
 
 那么为什么会与我们推理分析的不一样呢？原因就在于ThreadLocal的实现。
 [Source 4 ThreadLocal](http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b27/java/lang/ThreadLocal.java)
-``` java
+``` java?linenums
 public class ThreadLocal<T> {
     /* Thanks to Josh Bloch and Doug Lea for code reviews and impl advice. */
 
@@ -104,9 +104,9 @@ public class ThreadLocal<T> {
 
 从它的get、set方法的实现不难看出ThreadLocal中存储的T（泛型）是与所在线程有关系的。再回到Looper看不同的线程通过sThreadLocal.get()方法得到的Looper对象都是不一样的。ThreadLocal<Looper> sThreadLocal之所以定义为static的类型是为了让所有线程的Looper集中统一管理。Looper.prepare()方法就保证了Looper在这个线程存在的唯一性。
 
-#loop()
+## loop()
 这个方法就是Looper的主要功能了。
-``` java
+``` java?linenums
 public class Looper {
     ...
     /**
@@ -166,7 +166,7 @@ public class Looper {
 第33行通过Message的成员变量target分发Message，也需有些读者已经猜到了，这个target就是一个Handler对象。
 [See Message Source](http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/4.2.2_r1/android/os/Message.java/#89)
 进入这个loop方法就无限的循环起来了，直到MessageQueue.next()返回的Message为null以后这个循环就结束了。跟踪一下这个方法能让它返回为空就是在以下的代码块。mQuiting的控制请参考下面quit()方法。
-``` java
+``` java?linenums
 public class MessageQueue {
     final Message next() {
     ...
@@ -180,7 +180,7 @@ public class MessageQueue {
 ```
 [See MessageQueue Source](http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/4.2.2_r1/android/os/MessageQueue.java?av=f#127)
 
-#quit()
+## quit()
 ``` java
 public class Looper {
     ...    
@@ -196,7 +196,7 @@ public class Looper {
 }
 ```
 
-``` java
+``` java?linenums
 public class MessageQueue {
     ...
     final void quit() {
@@ -218,9 +218,9 @@ public class MessageQueue {
 这一步就是设置mQuiting标志，让Looper退出。
 [See MessageQueue Source](http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/4.2.2_r1/android/os/MessageQueue.java?av=f#127)
 
-#prepareMainLooper()
+## prepareMainLooper()
 这个就是主线程创建Looper时使用的方法。
-``` java
+``` java?linenums
 public class Looper {
     ...
     private static Looper sMainLooper;  // guarded by Looper.class
@@ -256,7 +256,7 @@ public class Looper {
 
 下面就是调用prepareMainLooper()方法的地方，可以看出它在初始化Activity主线程时也初始化的Looper同时，也让Looper loop起来。
 [Usages of prepareMainLooper()](http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/4.2.2_r1/android/app/ActivityThread.java#5025)
-``` java
+``` java?linenums
 public final class ActivityThread {
     ...
     public static void main(String[] args) {
@@ -286,8 +286,8 @@ public final class ActivityThread {
     ...
 }
 ```
-#dump()
-``` java
+# dump()
+``` java?linenums
 public class Looper {
     ...
     public void dump((Printer pw, String prefix) {
