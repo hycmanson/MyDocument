@@ -49,7 +49,7 @@ public void onClick(View v) {
 
 ## 关于单例模式的使用
 
-![4Example](https://raw.githubusercontent.com/hycmanson/MyDocument/master/CommonImages/4example.png)
+![4Example](https://raw.githubusercontent.com/hycmanson/MyDocument/master/MarkdownImages/4example.png)
 
 ``` java?linenums
 class DBHelper extends SQLiteOpenHelper {

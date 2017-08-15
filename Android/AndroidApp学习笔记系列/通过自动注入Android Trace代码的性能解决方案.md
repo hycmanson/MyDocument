@@ -66,21 +66,21 @@ sed -ig 's/name in parentNames/true/g' trace.html
 
 可得到如下效果的Trace文件：
 
-![1](https://raw.githubusercontent.com/hycmanson/MyDocument/master/Android/AndroidApp%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E7%B3%BB%E5%88%97/%E9%80%9A%E8%BF%87%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5Android%20Trace%E4%BB%A3%E7%A0%81%E7%9A%84%E6%80%A7%E8%83%BD%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/Images/Trace4Performance1.png)
+![1](https://raw.githubusercontent.com/hycmanson/MyDocument/master/MarkdownImages/Trace4Performance1.png)
 
 图一 Trace效果图
 
 用这种方案分析手淘的启动性能：
 
-![2](https://raw.githubusercontent.com/hycmanson/MyDocument/master/Android/AndroidApp%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E7%B3%BB%E5%88%97/%E9%80%9A%E8%BF%87%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5Android%20Trace%E4%BB%A3%E7%A0%81%E7%9A%84%E6%80%A7%E8%83%BD%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/Images/Trace4Performance2.png)
+![2](https://raw.githubusercontent.com/hycmanson/MyDocument/master/MarkdownImages/Trace4Performance2.png)
 
 TBLocationClient在UI Thread监听手淘的启动，并且进行了耗时的JSON解析。
 
-![3](https://raw.githubusercontent.com/hycmanson/MyDocument/master/Android/AndroidApp%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E7%B3%BB%E5%88%97/%E9%80%9A%E8%BF%87%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5Android%20Trace%E4%BB%A3%E7%A0%81%E7%9A%84%E6%80%A7%E8%83%BD%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/Images/Trace4Performance3.png)
+![3](https://raw.githubusercontent.com/hycmanson/MyDocument/master/MarkdownImages/Trace4Performance3.png)
 
 在MainActivity3 onCreate的时候，与CoordTask #1存在Lock Content，而CoordTask #1运作状态为：
 
-![4](https://raw.githubusercontent.com/hycmanson/MyDocument/master/Android/AndroidApp%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E7%B3%BB%E5%88%97/%E9%80%9A%E8%BF%87%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5Android%20Trace%E4%BB%A3%E7%A0%81%E7%9A%84%E6%80%A7%E8%83%BD%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/Images/Trace4Performance4.png)
+![4](https://raw.githubusercontent.com/hycmanson/MyDocument/master/MarkdownImages/Trace4Performance4.png)
 
 CoordTask #1与UI Thread在进行inflate，inflate是有同步锁的，此时可提高MainActivity3 onCreate优先级别来获取更多的资源，提供启动的性能。
 
