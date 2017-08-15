@@ -14,16 +14,16 @@ Conversion to Dalvik format failed:Unable to execute dex: method ID not in [0, 0
 1. 无法安装（Android 2.3 INSTALL_FAILED_DEXOPT）问题，是由dexopt的LinearAlloc限制引起的，在Android版本不同分别经历了4M/5M/8M/16M限制，目前主流4.2.x系统上可能都已到16M， 在Gingerbread或者以下系统LinearAllocHdr分配空间只有5M大小的， 高于Gingerbread的系统提升到了8M。Dalvik linearAlloc是一个固定大小的缓冲区。在应用的安装过程中，系统会运行一个名为dexopt的程序为该应用在当前机型中运行做准备。dexopt使用LinearAlloc来存储应用的方法信息。Android 2.2和2.3的缓冲区只有5MB，Android 4.x提高到了8MB或16MB。当方法数量过多导致超出缓冲区大小时，会造成dexopt崩溃。
 2. 超过最大方法数限制的问题，是由于DEX文件格式限制，一个DEX文件中method个数采用使用原生类型short来索引文件中的方法，也就是4个字节共计最多表达65536个method，filed/class的个数也均有此限制。对于DEX文件，则是将工程所需全部class文件合并且压缩到一个DEX文件期间，也就是Android打包的DEX过程中， 单个DEX文件可被引用的方法总数（自己开发的代码以及所引用的Android框架、类库的代码）被限制为65536；
 
-#插件化？ MultiDex？
+## 插件化？ MultiDex？
 解决这个问题，一般有下面几种方案，一种方案是加大Proguard的力度来减小DEX的大小和方法数，但这是治标不治本的方案，随着业务代码的添加，方法数终究会到达这个限制，一种比较流行的方案是插件化方案，另外一种是采用google提供的MultiDex方案，以及google在推出MultiDex之前Android Developers博客介绍的通过自定义类加载过程， 再就是Facebook推出的为Android应用开发的Dalvik补丁， 但facebook博客里写的不是很详细；我们在插件化方案上也做了探索和尝试，发现部署插件化方案，首先需要梳理和修改各个业务线的代码，使之解耦，改动的面和量比较巨大，通过一定的探讨和分析，我们认为对我们目前来说采用MultiDex方案更靠谱一些，这样我们可以快速和简洁的对代码进行拆分，同时代码改动也在可以接受的范围内； 这样我们采用了google提供的MultiDex方式进行了开发。
 
 插件化方案在业内有不同的实现原理，这里不再一一列举，这里只列举下Google为构建超过65K方法数的应用提供官方支持的方案：MultiDex。
 
 首先使用Android SDK Manager升级到最新的Android SDK Build Tools和Android Support Library。然后进行以下两步操作：
 
-##1.修改Gradle配置文件，启用MultiDex并包含MultiDex支持：
+### 1.修改Gradle配置文件，启用MultiDex并包含MultiDex支持：
 
-``` gradle
+``` gradle?linenums
   android {
     compileSdkVersion 21 buildToolsVersion "21.1.0"
 
@@ -42,13 +42,13 @@ Conversion to Dalvik format failed:Unable to execute dex: method ID not in [0, 0
 }
 ```
 
-##2.让应用支持多DEX文件。在官方文档中描述了三种可选方法：
+### 2.让应用支持多DEX文件。在官方文档中描述了三种可选方法：
 
 在AndroidManifest.xml的application中声明android.support.MultiDex.MultiDexApplication；
 如果你已经有自己的Application类，让其继承MultiDexApplication；
 如果你的Application类已经继承自其它类，你不想/能修改它，那么可以重写attachBaseContext()方法：
 
-``` java
+``` java?linenums
 @Override
 protected void attachBaseContext(Context base) {
     super.attachBaseContext(base);
@@ -58,7 +58,7 @@ protected void attachBaseContext(Context base) {
 
 并在Manifest中添加以下声明：
 
-``` xml
+``` xml?linenums
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.android.MultiDex.myapplication">
     <application
@@ -71,8 +71,8 @@ protected void attachBaseContext(Context base) {
 
 如果已经有自己的Application，则让其继承MultiDexApplication即可。
 
-#Dex自动拆包及动态加载
-##MultiDex带来的问题
+## Dex自动拆包及动态加载
+### MultiDex带来的问题
 在第一版本采用MultiDex方案上线后，在Dalvik下MultiDex带来了下列几个问题：
 
 在冷启动时因为需要安装DEX文件，如果DEX文件过大时，处理时间过长，很容易引发ANR（Application Not Responding）；
@@ -84,7 +84,7 @@ MultiDex的基本原理是把通过DexFile来加载Secondary DEX，并存放在B
 
 下面代码片段是BaseDexClassLoader findClass的过程:
 
-``` java
+``` java?linenums
 protected Class<?> findClass(String name) throws ClassNotFoundException {
     List<Throwable> suppressedExceptions = new ArrayList<Throwable>();
     Class c = pathList.findClass(name, suppressedExceptions);
@@ -101,7 +101,7 @@ protected Class<?> findClass(String name) throws ClassNotFoundException {
 
 下面代码片段为怎么通过DexFile来加载Secondary DEX并放到BaseDexClassLoader的DexPathList中:
 
-``` java
+``` java?linenums
 private static void install(ClassLoader loader, List<File> additionalClassPathEntries, File optimizedDirectory) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, InvocationTargetException, NoSuchMethodException {
     /* The patched class loader is expected to be a descendant of
      * dalvik.system.BaseDexClassLoader. We modify its
@@ -143,7 +143,7 @@ private static void install(ClassLoader loader, List<File> additionalClassPathEn
 }
 ```
 
-##Dex自动拆包及动态加载方案简介
+### Dex自动拆包及动态加载方案简介
 通过查看MultiDex的源码，我们发现MultiDex在冷启动时容易导致ANR的瓶颈， 在2.1版本之前的Dalvik的VM版本中， MultiDex的安装大概分为几步，第一步打开apk这个zip包，第二步把MultiDex的dex解压出来（除去Classes.dex之外的其他DEX，例如：classes2.dex， classes3.dex等等)，因为android系统在启动app时只加载了第一个Classes.dex，其他的DEX需要我们人工进行安装，第三步通过反射进行安装，这三步其实都比较耗时， 为了解决这个问题我们考虑是否可以把DEX的加载放到一个异步线程中，这样冷启动速度能提高不少，同时能够减少冷启动过程中的ANR，对于Dalvik linearAlloc的一个缺陷[(Issue 22586)](https://code.google.com/p/android/issues/detail?id=22586)和限制[(Issue 78035)](https://code.google.com/p/android/issues/detail?id=78035)，我们考虑是否可以人工对DEX的拆分进行干预，使每个DEX的大小在一定的合理范围内，这样就减少触发Dalvik linearAlloc的缺陷和限制； 为了实现这几个目的，我们需要解决下面三个问题：
 
 1. 在打包过程中如何产生多个的DEX包？
@@ -156,7 +156,7 @@ private static void install(ClassLoader loader, List<File> additionalClassPathEn
 
 为了实现产生多个DEX包，我们可以在生成DEX文件的这一步中， 在Ant或gradle中自定义一个Task来干预DEX产生的过程，从而产生多个DEX，下图是在ant和gradle中干预产生DEX的自定task的截图:
 
-```java
+``` java?linenums
 tasks.whenTaskAdded { task ->
     if (task.name.startsWith('proguard') && (task.name.endsWith('Debug') || task.name.endsWith('Release'))) {
         task.doLast {
@@ -179,7 +179,7 @@ tasks.whenTaskAdded { task ->
 
 随着第二个问题的迎刃而解，我们来到了比较棘手的第三问题，如果我们在后台加载Secondary DEX过程中，用户点击界面将要跳转到使用了在Secondary DEX中class的界面， 那此时必然发生ClassNotFoundException, 那怎么解决这个问题呢，在所有的Activity跳转代码处添加判断Secondary DEX是否加载完成？这个方法可行，但工作量非常大； 那有没有更好的解决方案呢？我们通过分析Activity的启动过程，发现Activity是由ActivityThread 通过Instrumentation来启动的，我们是否可以在Instrumentation中做一定的手脚呢？通过分析代码ActivityThread和Instrumentation发现，Instrumentation有关Activity启动相关的方法大概有：execStartActivity、newActivity等等，这样我们就可以在这些方法中添加代码逻辑进行判断这个Class是否加载了，如果加载则直接启动这个Activity，如果没有加载完成则启动一个等待的Activity显示给用户，然后在这个Activity中等待后台Secondary DEX加载完成，完成后自动跳转到用户实际要跳转的Activity；这样在代码充分解耦合，以及每个业务代码能够做到颗粒化的前提下，我们就做到Secondary DEX的按需加载了， 下面是Instrumentation添加的部分关键代码：
 
-```java
+``` java?linenums
     public ActivityResult execStartActivity(Context who, IBinder contextThread, IBinder token, Activity target,
                                             Intent intent, int requestCode) {
         ActivityResult activityResult = null;
@@ -245,5 +245,5 @@ tasks.whenTaskAdded { task ->
 ```
 实际应用中我们还遇到另外一个比较棘手的问题， 就是Field的过多的问题，Field过多是由我们目前采用的代码组织结构引入的，我们为了方便多业务线、多团队并发协作的情况下开发，我们采用的aar的方式进行开发，并同时在aar依赖链的最底层引入了一个通用业务aar，而这个通用业务aar中包含了很多资源，而ADT14以及更高的版本中对Library资源处理时，Library的R资源不再是static final的了，详情请查看[(google官方说明)](http://tools.android.com/tips/non-constant-fields)，这样在最终打包时Library中的R没法做到内联，这样带来了R field过多的情况，导致需要拆分多个Secondary DEX，为了解决这个问题我们采用的是在打包过程中利用脚本把Libray中R filed（例如ID、Layout、Drawable等）的引用替换成常量，然后删去Library中R.class中的相应Field。
 
-#总结
+## 总结
 上面就是我们在使用MultiDex过程中进化而来的DEX自动化拆包的方案， 这样我们就可以通过脚本控制来进行自动化的拆分DEX，然后在运行时自由的加载Secondary DEX，既能保证冷启动速度，又能减少运行时的内存占用。
