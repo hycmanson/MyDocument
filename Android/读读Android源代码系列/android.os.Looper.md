@@ -286,7 +286,7 @@ public final class ActivityThread {
     ...
 }
 ```
-# dump()
+## dump()
 ``` java?linenums
 public class Looper {
     ...
