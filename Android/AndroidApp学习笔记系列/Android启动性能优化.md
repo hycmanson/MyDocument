@@ -3,7 +3,7 @@ Android有着许多可视化性能工具：TraceView、Systrace、HierarchyViewe
 
 ## 1.SvipLifeCycleObserver.onActivityResumed的Mtop请求:
 
-![1](https://raw.githubusercontent.com/hycmanson/MyDocument/master/MarkdownImages/Performance1.png)
+![1](https://raw.githubusercontent.com/hycmanson/MyDocument/master/MarkDownImages/Performance1.png)
 
 图一 Welcome.onResume耗时
 
@@ -58,7 +58,7 @@ AppMonitor是性能埋点的初始化，在TaobaoInitializer里面：
 
 显然是一个Async的init过程，但Trace文件里面：
 
-![2](https://raw.githubusercontent.com/hycmanson/MyDocument/master/MarkdownImages/Performance2.png)
+![2](https://raw.githubusercontent.com/hycmanson/MyDocument/master/MarkDownImages/Performance2.png)
 
 图二 AppMonitor Init线程
 
@@ -87,7 +87,7 @@ AppMonitor Init既然在UI Thread里面进行的，为了近一步确认，dump 
 ## 3.getAppKey性能:
 getAppKey是获取App Key函数，启动的时候：
 
-![3](https://raw.githubusercontent.com/hycmanson/MyDocument/master/MarkdownImages/Performance3.png)
+![3](https://raw.githubusercontent.com/hycmanson/MyDocument/master/MarkDownImages/Performance3.png)
 
 图三 getAppKey耗时
 
