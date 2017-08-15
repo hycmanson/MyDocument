@@ -1,10 +1,11 @@
-#概述
+# 美团Android DEX自动拆包及动态加载简介
+## 概述
 作为一个android开发者，在开发应用时，随着业务规模发展到一定程度，不断地加入新功能、添加新的类库，代码在急剧的膨胀，相应的apk包的大小也急剧增加， 那么终有一天，你会不幸遇到这个错误：
 
 生成的apk在android 2.3或之前的机器上无法安装，提示INSTALL_FAILED_DEXOPT
 方法数量过多，编译时出错，提示：
 
-``` java
+``` java?linenums
 Conversion to Dalvik format failed:Unable to execute dex: method ID not in [0, 0xffff]: 65536
 ```
 
