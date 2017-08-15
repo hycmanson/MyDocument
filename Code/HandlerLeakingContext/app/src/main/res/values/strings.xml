@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">HandlerLeakingContext</string>
+
+    <string name="leaking_test">leaking_test</string>
+    <string name="unleaking_test">unleaking_test</string>
+    <string name="action_settings">Settings</string>
+</resources>
