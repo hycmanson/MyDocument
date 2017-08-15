@@ -1,3 +1,4 @@
+# 通过自动注入Android Trace代码的性能解决方案
 在Android进行性能分析，系统提供了TraceView及Systrace两种工具。TraceView可对VM的所有Java Method进行Profile，能有效的发现APP性能问题。Systrace是Android 4.1中新增加的系统性能分析工具，主要针对Framework的性能，比如SurfaceFlinger、Audio、View、CPU Load、workqueue等系统模块，尤其擅长Profile Graphic系统(Systrace源自于Project Butter)。熟练的使用TraceView和Systrace性能分析工具，在解决性能问题时，可以达到事半功倍的效果，然而TraceView和Systrace都存在各自的缺点：
 
 1. TraceView会Trace VM的所有Jave Method，会禁止Dalvik的JIT，性能开销也可达几倍甚至几十倍，性能开销太大，而且对不同类型的函数，开销影响不一致，偏离了原始性能，导致数据的可性度下降，而且对所有的Jave Method进行Trace，Trace的函数太多，导致分析trace文件过于繁杂。
