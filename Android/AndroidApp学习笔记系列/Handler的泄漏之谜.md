@@ -1,12 +1,12 @@
-#Handler的泄漏之谜
-#在Activity内的Handler如果是内部类而不带有static属性为什么会造成内存的泄漏
-#背景
+# Handler的泄漏之谜
+## 在Activity内的Handler如果是内部类而不带有static属性为什么会造成内存的泄漏
+## 背景
 之前在开发的时候遇见了在Android Lint给出了的一个提示HandlerLeak: Handler reference leaks。今天来追究一下其中的原因。
 
-#Android Lint给出的提示与解决方案
+## Android Lint给出的提示与解决方案
 通过gradle编译会在app\build\outputs下生成一份Lint的html文档，打开部分内容如下：
 
-``` java
+``` java?linenums
 HandlerLeak: Handler reference leaks
 ../../src/main/java/com/hyc/handlerleakingcontext/LeakingActivity.java:12: This Handler class should be static or leaks might occur (new android.os.Handler(){})
    9  * Created by yichao.hyc on 2015/12/14.
@@ -29,17 +29,17 @@ To suppress this error, use the issue id "HandlerLeak" as explained in the Suppr
 
 大致的意思就是如果把Handler定义为内部类，就有可能造成内存泄露。解决它的办法就是把Handler定义为static的类型。
 
-#为什么static以后就不会泄露了呢？
+## 为什么static以后就不会泄露了呢？
 打个断点看一下，如下图：
 
 ![LeakingProblem](https://raw.githubusercontent.com/hycmanson/AndroidLearning/master/MarkDownImages/handler1.png)
 
 Handler居然会有Activity的引用，这个也是内部类的特性之一。那如果Activity在message send之前finish那么gc就无法回收finish的Activity因为还在被handler引用着。那这么问题原因找到了，就可以修改它了。
 
-#解决方案
+## 解决方案
 思路就是把Handler定义为static如果需要引用外部类可以使用WeakReference的调用方式，在onDestory方法的时候可以把message remove掉。
 
-``` java
+``` java?linenums
 package com.hyc.handlerleakingcontext;
 
 import android.app.Activity;
@@ -95,7 +95,7 @@ public class UnLeakingActivity extends Activity {
 [源码见 https://github.com/hycmanson/MyDocument/tree/master/Code/HandlerLeakingContext](https://github.com/hycmanson/MyDocument/tree/master/Code/HandlerLeakingContext)
 
 
-#PS
+## PS
 如果非static的内部类的生命周期大于Activity，应该避免在Activity内使用。
 这里给一个泄漏的栗子：
 
