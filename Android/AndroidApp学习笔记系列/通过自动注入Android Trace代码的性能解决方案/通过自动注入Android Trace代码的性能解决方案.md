@@ -90,10 +90,10 @@ CoordTask #1与UI Thread在进行inflate，inflate是有同步锁的，此时可
 
 参考文献：
 
-http://developer.android.com/intl/zh-cn/tools/help/systrace.html
+https://developer.android.google.cn/intl/zh-cn/tools/help/systrace.html
 
-http://developer.android.com/intl/zh-cn/tools/debugging/systrace.html
+https://developer.android.google.cn/intl/zh-cn/tools/debugging/systrace.html
 
-http://developer.android.com/intl/zh-cn/tools/debugging/debugging-tracing.html
+https://developer.android.google.cn/intl/zh-cn/tools/debugging/debugging-tracing.html
 
 http://blog.csdn.net/innost/article/details/9008691
